@@ -12,3 +12,4 @@
 |            | [Task 03 - Hard](./25_10_02-Task-3Difficulties/task_hard.c)               |
 | 25/10/09   | [Task 01 - Singly Linked List](./25_10_09-Task1-2/task_1.c) |
 |            | [Task 02 - Doubly Linked List](./25_10_09-Task1-2/task_2.c) |
+| 25/10/16   | [Task 01 - Circular Linked List](./25_10_16-Task1/task_1.cpp) |
