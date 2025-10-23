@@ -13,3 +13,4 @@
 | 25/10/09   | [Task 1 - Singly Linked List](./25_10_09-Task1-2/task_1.c) |
 |            | [Task 2 - Doubly Linked List](./25_10_09-Task1-2/task_2.c) |
 | 25/10/16   | [Task 1 - Circular Linked List](./25_10_16-Task1/task_1.cpp) |
+| 25/10/23   | [Task - Stack](./25_10_23-Task/task_1.c) |
