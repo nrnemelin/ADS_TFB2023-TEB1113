@@ -15,3 +15,4 @@
 | 25/10/16   | [Task 1 - Circular Linked List](./25_10_16-Task1/task_1.cpp) |
 | 25/10/23   | [Task - Stack](./25_10_23-Task/task_1.c) |
 | 25/11/06   | [Task - Queue](./25_11_06-Task/task.cpp) |
+| 25/11/13   | [Task - Binary Tree Search](./25_11_13-Task/task.cpp) |
