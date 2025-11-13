@@ -1,156 +1,181 @@
 #include <iostream>
-#include <string>
 
-// --- Part 1: The Node for a Tree ---
+// --- 1. Tree Representation ---
 struct Node {
-  int data;
-  Node* left;
-  Node* right;
+    int data;
+    Node* left;
+    Node* right;
 
-  Node(int value) {
-    data = value;
-    left = nullptr;
-    right = nullptr;
-  }
+    Node(int value) {
+        data = value;
+        left = nullptr;
+        right = nullptr;
+    }
 };
 
-// --- Part 2: The Binary Search Tree (BST) Class ---
+// --- 2. Binary Tree Implementation ---
 class BinarySearchTree {
 private:
-  Node* root;
-  Node* insertRecursive(Node* currentNode, int value) {
-    // 1. Base Case: If the spot is empty, create the new node here
-    if (currentNode == nullptr) {
-      return new Node(value);
+    Node* root;
+
+    Node* insertRecursive(Node* current, int value) {
+        if (current == nullptr) {
+            return new Node(value);
+        }
+        if (value < current->data) {
+            current->left = insertRecursive(current->left, value);
+        } else if (value > current->data) {
+            current->right = insertRecursive(current->right, value);
+        }
+        return current;
     }
 
-    // 2. Recursive Step: Go left or right
-    if (value < currentNode->data) {
-      currentNode->left = insertRecursive(currentNode->left, value);
-    } else {
-      currentNode->right = insertRecursive(currentNode->right, value);
-    }
-    
-    return currentNode;
-  }
-
-  // Recursive helper for printing "In-Order"
-  // (Left, Root, Right) - This prints a sorted list!
-  void inOrderRecursive(Node* currentNode) {
-    if (currentNode == nullptr) {
-      return;
-    }
-    
-    inOrderRecursive(currentNode->left);  // 1. Go Left
-    std::cout << currentNode->data << " "; // 2. Print Root
-    inOrderRecursive(currentNode->right); // 3. Go Right
-  }
-
-  // Recursive helper for "Pre-Order"
-  // (Root, Left, Right) - Useful for copying a tree
-  void preOrderRecursive(Node* currentNode) {
-    if (currentNode == nullptr) {
-      return;
+    Node* findMin(Node* node) {
+        while (node->left != nullptr) {
+            node = node->left;
+        }
+        return node;
     }
 
-    std::cout << currentNode->data << " "; // 1. Print Root
-    preOrderRecursive(currentNode->left);  // 2. Go Left
-    preOrderRecursive(currentNode->right); // 3. Go Right
-  }
+    Node* deleteRecursive(Node* current, int value) {
+        if (current == nullptr) return current;
 
-  // Recursive helper for "Post-Order"
-  // (Left, Right, Root) - Useful for deleting a tree
-  void postOrderRecursive(Node* currentNode) {
-    if (currentNode == nullptr) {
-      return;
+        // Step 1: Find the node to delete
+        if (value < current->data) {
+            current->left = deleteRecursive(current->left, value);
+        } else if (value > current->data) {
+            current->right = deleteRecursive(current->right, value);
+        } else {
+            // Step 2: We found the node! Now delete it.
+            
+            // Case 1: No child (Leaf node) or One child
+            if (current->left == nullptr) {
+                Node* temp = current->right;
+                delete current;
+                return temp;
+            } else if (current->right == nullptr) {
+                Node* temp = current->left;
+                delete current;
+                return temp;
+            }
+
+            // Case 2: Two children
+            // Find smallest value in the right subtree
+            Node* temp = findMin(current->right);
+            
+            current->data = temp->data;
+            
+            current->right = deleteRecursive(current->right, temp->data);
+        }
+        return current;
     }
 
-    postOrderRecursive(currentNode->left);  // 1. Go Left
-    postOrderRecursive(currentNode->right); // 2. Go Right
-    std::cout << currentNode->data << " "; // 3. Print Root
-  }
+    bool searchRecursive(Node* current, int value) {
+        if (current == nullptr) return false;
+        if (current->data == value) return true;
 
-  void destroyRecursive(Node* currentNode) {
-    if (currentNode == nullptr) {
-      return;
+        if (value < current->data) {
+            return searchRecursive(current->left, value);
+        } else {
+            return searchRecursive(current->right, value);
+        }
     }
-    
-    destroyRecursive(currentNode->left);  // Delete left
-    destroyRecursive(currentNode->right); // Delete right side
-    delete currentNode;                 // Delete this node
-  }
 
+    // --- 3. Tree Traversal Algorithms ---
+    void inOrderRecursive(Node* current) {
+        if (current == nullptr) return;
+        inOrderRecursive(current->left);
+        std::cout << current->data << " ";
+        inOrderRecursive(current->right);
+    }
+
+    void preOrderRecursive(Node* current) {
+        if (current == nullptr) return;
+        std::cout << current->data << " ";
+        preOrderRecursive(current->left);
+        preOrderRecursive(current->right);
+    }
+
+    void postOrderRecursive(Node* current) {
+        if (current == nullptr) return;
+        postOrderRecursive(current->left);
+        postOrderRecursive(current->right);
+        std::cout << current->data << " ";
+    }
 
 public:
+    BinarySearchTree() { root = nullptr; }
 
-  BinarySearchTree() {
-    root = nullptr;
-  }
+    // --- 4. Insert, Delete, Update Operations ---
+    
+    void insert(int value) {
+        root = insertRecursive(root, value);
+        std::cout << "Inserted: " << value << std::endl;
+    }
 
-  ~BinarySearchTree() {
-    std::cout << "\n(Cleaning up the tree...)" << std::endl;
-    destroyRecursive(root);
-  }
+    void deleteNode(int value) {
+        root = deleteRecursive(root, value);
+        std::cout << "Deleted: " << value << std::endl;
+    }
 
-  void insert(int value) {
-    std::cout << "Inserting: " << value << std::endl;
-    root = insertRecursive(root, value);
-  }
+    void update(int oldValue, int newValue) {
+        if (searchRecursive(root, oldValue)) {
+            std::cout << "Updating " << oldValue << " to " << newValue << "..." << std::endl;
+            deleteNode(oldValue);
+            insert(newValue);
+        } else {
+            std::cout << "Error: Value " << oldValue << " not found in tree." << std::endl;
+        }
+    }
 
-  // Public "In-Order" traversal
-  void printInOrder() {
-    std::cout << "In-Order (Sorted): ";
-    inOrderRecursive(root);
-    std::cout << std::endl;
-  }
+    // Traversals
+    void displayInOrder() {
+        std::cout << "In-Order: ";
+        inOrderRecursive(root);
+        std::cout << std::endl;
+    }
+    
+    void displayPreOrder() {
+        std::cout << "Pre-Order: ";
+        preOrderRecursive(root);
+        std::cout << std::endl;
+    }
 
-  // Public "Pre-Order" traversal
-  void printPreOrder() {
-    std::cout << "Pre-Order (Root-L-R): ";
-    preOrderRecursive(root);
-    std::cout << std::endl;
-  }
-
-  // Public "Post-Order" traversal
-  void printPostOrder() {
-    std::cout << "Post-Order (L-R-Root): ";
-    postOrderRecursive(root);
-    std::cout << std::endl;
-  }
+    void displayPostOrder() {
+        std::cout << "Post-Order: ";
+        postOrderRecursive(root);
+        std::cout << std::endl;
+    }
 };
 
-
-// --- Part 3: Main Execution ---
 int main() {
-  BinarySearchTree myTree;
+    BinarySearchTree tree;
 
-  myTree.insert(50);
-  myTree.insert(30);
-  myTree.insert(70);
-  myTree.insert(20);
-  myTree.insert(40);
-  myTree.insert(60);
-  myTree.insert(80);
+    // 1. Inserting Elements
+    std::cout << "--- 1. Inserting Elements ---" << std::endl;
+    tree.insert(50);
+    tree.insert(30);
+    tree.insert(20);
+    tree.insert(40);
+    tree.insert(70);
+    tree.insert(60);
+    tree.insert(80);
 
-  /*
-   The tree will look like this:
-          50
-         /  \
-        30    70
-       / \   / \
-      20 40 60 80
-  */
+    // 2. Traversals
+    std::cout << "\n--- 2. Tree Traversals ---" << std::endl;
+    tree.displayInOrder();
+    tree.displayPreOrder();
+    tree.displayPostOrder();
 
-  std::cout << "\n--- Printing Tree Traversals ---" << std::endl;
-  
-  // 1. In-Order will print the numbers sorted
-  myTree.printInOrder();
+    // 3. Updating Elements
+    std::cout << "\n--- 3. Updating Element (30 -> 35) ---" << std::endl;
+    tree.update(30, 35);
+    tree.displayInOrder();
 
-  // 2. Pre-Order prints the root first
-  myTree.printPreOrder();
+    // 4. Deleting Elements
+    std::cout << "\n--- 4. Deleting Element (20) ---" << std::endl;
+    tree.deleteNode(20);
+    tree.displayInOrder();
 
-  // 3. Post-Order prints the root last
-  myTree.printPostOrder();
-
-  return 0;
+    return 0;
 }
